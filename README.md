@@ -1,33 +1,91 @@
-# Bot de Filtro de Vagas (WhatsApp)
+🚀 Job Search Filter Bot (WhatsApp)
 
-Bot em Node.js que lê mensagens de grupos do WhatsApp, aplica filtros por palavras-chave (área e/ou localização) e encaminha apenas as mensagens relevantes para um grupo destino. Inclui uma interface web por etapas (QR → Configuração → Execução) para facilitar o uso.
+Automação inteligente para filtrar e organizar vagas de emprego recebidas em grupos do WhatsApp.
 
-## Principais recursos
+Este bot monitora grupos selecionados, aplica filtros personalizados por área profissional e/ou localização, e encaminha apenas as mensagens relevantes para um grupo de destino — reduzindo ruído e aumentando eficiência na busca por oportunidades.
 
-- UI por etapas (QR Code → Configuração → Execução)
-- Seleção de múltiplos grupos monitorados
-- Processamento sequencial por grupo (evita sobrecarga)
-- Filtro: mensagem passa se bater em **área OU localização**
-- Logs em tempo real na UI (sem salvar conteúdo sensível por padrão)
+📌 Problema que resolve
 
-## Requisitos
+Grupos de vagas no WhatsApp costumam apresentar:
 
-- Node.js 20+
-- Google Chrome/Chromium disponível (usado pelo WhatsApp Web via Puppeteer)
+Alto volume de mensagens irrelevantes
 
-## Como rodar (local)
+Falta de organização
 
-1) Instale dependências:
+Informações repetidas
 
-```bash
+Perda de oportunidades por excesso de ruído
+
+Este projeto automatiza esse processo, funcionando como um filtro inteligente de oportunidades.
+
+💡 Visão de Produto (Evolução Comercial)
+
+Este projeto começou como uma solução pessoal para otimizar minha busca por vagas.
+
+Porém, a arquitetura foi pensada para permitir evolução futura para um modelo mais comercial e aplicável ao mercado de trabalho, como por exemplo:
+
+🔹 Plataforma SaaS de curadoria automática de vagas
+
+🔹 Ferramenta para recrutadores filtrarem candidatos automaticamente
+
+🔹 Sistema de triagem automatizada por palavras-chave
+
+🔹 Monitoramento inteligente de oportunidades em múltiplas fontes
+
+A ideia é evoluir o bot de um uso pessoal para uma solução escalável e útil para empresas e profissionais.
+
+⚙️ Tecnologias Utilizadas
+
+Node.js 20+
+
+Automação do WhatsApp Web (Puppeteer)
+
+Interface Web com fluxo guiado
+
+Variáveis de ambiente (.env)
+
+Processamento assíncrono controlado
+
+Sistema opcional de logs
+
+🧠 Arquitetura e Decisões Técnicas
+
+✔ Processamento sequencial por grupo (reduz risco de bloqueio)
+
+✔ Delay configurável para simular comportamento humano
+
+✔ Filtro flexível (Área OU Localização)
+
+✔ Interface isolada por padrão (127.0.0.1)
+
+✔ Logs desativados por padrão (privacy-first)
+
+✔ Estrutura preparada para futura integração com banco de dados
+
+🎯 Funcionalidades
+
+🔎 Monitoramento de múltiplos grupos
+
+🧠 Filtro inteligente por palavras-chave
+
+🔁 Encaminhamento automático
+
+🖥 Interface Web com fluxo por etapas:
+
+QR Code
+
+Configuração
+
+Execução
+
+📊 Logs em tempo real
+
+⚙ Configuração via .env ou interface
+
+🛠 Como Rodar Localmente
+1️⃣ Instalar dependências
 npm install
-```
-
-2) (Opcional) Crie um arquivo `.env` na raiz do projeto (ele NÃO deve ser commitado).
-
-Exemplo de variáveis:
-
-```env
+2️⃣ Criar arquivo .env (opcional)
 MONITORED_GROUPS=Grupo A,Grupo B
 DESTINATION_GROUP=Grupo Destino
 LOCATION_KEYWORDS=Brasília,Asa Sul,Sudoeste
@@ -35,39 +93,57 @@ AREA_KEYWORDS=ti,dados,power bi
 DELAY_MIN_SEC=2
 DELAY_MAX_SEC=6
 
-# Logs em arquivo (opcional). Padrão: desativado.
 LOG_ENABLED=false
 LOG_DIR=logs
 LOG_FILE=forwarded.jsonl
 
-# UI (padrão: só localhost)
 UI_PORT=3000
 UI_HOST=127.0.0.1
-```
-
-3) Inicie:
-
-```bash
+3️⃣ Iniciar aplicação
 node index.js
-```
+4️⃣ Acessar interface
+http://127.0.0.1:3000
+🔐 Segurança
 
-4) Abra a interface:
+.env e .wwebjs_auth/ devem estar no .gitignore
 
-- http://127.0.0.1:3000
+Interface acessível apenas localmente por padrão
 
-Fluxo:
+Logs não armazenam o texto integral das mensagens
 
-- Escaneie o QR Code
-- Configure grupos, destino, palavras-chave e delays
-- Clique em “Iniciar leitura”
+Projeto destinado a uso responsável
 
-## Segurança e privacidade
+📈 Roadmap Futuro
 
-- **Nunca** commite `.env` (config local) nem `.wwebjs_auth/` (sessão do WhatsApp).
-- A UI, por padrão, roda somente em `127.0.0.1` para evitar acesso por terceiros na rede.
-- Logs em arquivo ficam **desativados por padrão** e, mesmo ligados, não salvam o texto integral da mensagem.
+Dashboard com métricas e estatísticas
 
-## Observações
+Banco de dados estruturado
 
-- Este projeto depende de automação via WhatsApp Web. Use com responsabilidade e esteja ciente de possíveis limitações/regras da plataforma.
+Sistema de pontuação por relevância (score)
 
+API REST para integração externa
+
+Deploy em VPS com autenticação
+
+Transformação em produto SaaS
+
+🧑‍💻 Sobre o Projeto
+
+Este projeto demonstra habilidades em:
+
+Automação web
+
+Arquitetura backend em Node.js
+
+Controle de concorrência
+
+Design de fluxo de usuário
+
+Pensamento de produto
+
+Planejamento de escalabilidade
+
+⚠ Aviso
+
+Este projeto depende da automação do WhatsApp Web.
+Use com responsabilidade e respeite as políticas da plataforma.
