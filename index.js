@@ -60,6 +60,14 @@ const sleep = (ms) =>
     setTimeout(resolve, ms);
   });
 
+const withTimeout = (promise, timeoutMs, label) =>
+  Promise.race([
+    promise,
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error(`${label} timeout`)), timeoutMs)
+    ),
+  ]);
+
 const randomDelay = (min, max) =>
   Math.floor(Math.random() * (max - min + 1)) + min;
 
@@ -238,20 +246,54 @@ const processUnreadMessages = async () => {
 let isClientReady = false;
 
 const syncGroups = async () => {
-  if (!isClientReady) return;
+  if (!isClientReady) {
+    state.lastSyncError = "Cliente ainda não está pronto";
+    updateConnection("Cliente ainda não está pronto", "sync_groups_waiting");
+    return;
+  }
   if (state.isSyncing) return;
   state.isSyncing = true;
   state.lastSyncError = null;
   updateConnection("Sincronizando grupos", "sync_groups");
   try {
-    const chats = await client.getChats();
-    state.destinationChat = getGroupChatByName(
-      chats,
-      config.destinationGroup
-    );
-    buildMonitoringIndex(chats);
-    state.lastSyncAt = Date.now();
-    updateConnection("Grupos sincronizados", "sync_groups_done");
+    const maxAttempts = 4;
+    for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+      try {
+        const chats = await withTimeout(
+          client.getChats(),
+          45000,
+          "getChats"
+        );
+        if (!Array.isArray(chats) || chats.length === 0) {
+          throw new Error("Nenhum chat retornado");
+        }
+        const groupCount = chats.filter((chat) => chat.isGroup).length;
+        if (groupCount === 0) {
+          throw new Error("Nenhum grupo encontrado");
+        }
+        state.destinationChat = getGroupChatByName(
+          chats,
+          config.destinationGroup
+        );
+        buildMonitoringIndex(chats);
+        state.lastSyncAt = Date.now();
+        state.lastSyncError = null;
+        updateConnection("Grupos sincronizados", "sync_groups_done");
+        break;
+      } catch (error) {
+        state.lastSyncError = error.message || String(error);
+        updateConnection(
+          `Falha ao sincronizar (tentativa ${attempt}/${maxAttempts})`,
+          "sync_groups_retry",
+          error
+        );
+        if (attempt < maxAttempts) {
+          await sleep(1000 * attempt);
+          continue;
+        }
+        updateConnection("Erro ao sincronizar grupos", "sync_groups_error", error);
+      }
+    }
   } catch (error) {
     state.lastSyncError = error.message || String(error);
     updateConnection("Erro ao sincronizar grupos", "sync_groups_error", error);
@@ -840,6 +882,7 @@ client.on("ready", async () => {
   setUiStep("config");
   updateConnection("Conectado", "ready");
   console.log("WhatsApp Web conectado. Iniciando leitura.");
+  await sleep(3000);
   await refreshMonitoring();
 });
 
